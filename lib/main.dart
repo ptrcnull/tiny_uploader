@@ -85,6 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _sharedText;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  bool buttonLocked = false;
+
   @override
   void initState() {
     super.initState();
@@ -144,6 +146,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> upload() async {
     print("uploading...");
+    setState(() {
+      buttonLocked = true;
+    });
     SharedPreferences prefs = await _prefs;
     String? server = prefs.getString("server");
     String? token = prefs.getString("token");
@@ -222,33 +227,45 @@ class _MyHomePageState extends State<MyHomePage> {
           children: getElements(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          upload().then((url) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Uploaded as $url"),
-                action: SnackBarAction(
-                  label: 'Copy',
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(
-                      text: url,
-                    ));
-                  },
-                ),
-              ),
-            );
-          }).catchError((error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Error: ${error.toString()}"),
-              ),
-            );
-          });
-        },
-        tooltip: 'Upload',
-        child: const Icon(Icons.send),
-      ),
+      floatingActionButton: !buttonLocked
+          ? FloatingActionButton(
+              onPressed: () {
+                upload().then((url) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 30),
+                      content: Text("Uploaded as $url"),
+                      action: SnackBarAction(
+                        label: 'Copy',
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(
+                            text: url,
+                          ));
+                        },
+                      ),
+                    ),
+                  );
+                }).catchError((error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Error: ${error.toString()}"),
+                    ),
+                  );
+                }).whenComplete(() {
+                  setState(() {
+                    buttonLocked = false;
+                  });
+                });
+              },
+              tooltip: 'Upload',
+              child: const Icon(Icons.send),
+            )
+          : FloatingActionButton(
+              onPressed: () {},
+              tooltip: 'Upload',
+              backgroundColor: Colors.grey,
+              child: const Icon(Icons.send),
+            ),
     );
   }
 }
