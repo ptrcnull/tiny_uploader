@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tiny_uploader">
    <application
-        android:label="tiny_uploader"
+        android:label="tiny uploader"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
