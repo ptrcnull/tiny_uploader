@@ -185,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     print(res.headers);
 
-    return res.body;
+    return res.body.trim();
   }
 
   List<Widget> getElements() {
